@@ -1,0 +1,134 @@
+---
+
+  - name: install updates (Ubuntu)
+    apt:
+       upgrade: dist
+       update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install apache and php for Ubuntu
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+
+  - name: install mariadb package (Ubuntu)
+    apt:
+      name: mariadb-server
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install the required packages for Ubuntu
+    command: sudo apt install wget unzip curl openssl build-essential libgd-dev libssl-dev libapache2-mod-php php-gd php apache2 -y
+    when: ansible_distribution == "Ubuntu"
+
+  - name: download nagios core setup files for Ubuntu
+    command: wget https://assets.nagios.com/downloads/nagioscore/releases/nagios-4.4.6.tar.gz
+    when: ansible_distribution == "Ubuntu"
+
+  - name: extracting the downloaded file for Ubuntu
+    command: sudo tar -zxvf nagios-4.4.6.tar.gz
+    when: ansible_distribution == "Ubuntu"
+
+  - name: running nagios core configure script for Ubuntu
+    command: ./configure
+    args:
+      chdir: nagios-4.4.6/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: compile the main programs and CGIs for Ubuntu
+    command: sudo make all
+    args:
+      chdir: nagios-4.4.6/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: make and install group and user for Ubuntu
+    command: sudo make install-groups-users
+    args:
+      chdir: nagios-4.4.6/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: add www-data directories user to nagios group for Ubuntu
+    command: sudo usermod -a -G nagios www-data
+    args:
+      chdir: nagios-4.4.6/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install nagios for Ubuntu
+    command: sudo make install
+    args:
+      chdir: nagios-4.4.6/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: initalize all the installation configuration scripts for Ubuntu
+    command: sudo make install-init
+    args:
+      chdir: nagios-4.4.6/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install and configure permissions on the config's directory for Ubuntu
+    command: sudo make install-commandmode
+    args:
+      chdir: nagios-4.4.6/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install sample config files for Ubuntu
+    command: sudo make install-config
+    args:
+      chdir: nagios-4.4.6/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: enable apache rewrite mode for Ubuntu
+    command: sudo a2enmod rewrite
+    args:
+      chdir: nagios-4.4.6/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: enable CGI config for Ubuntu
+    command: sudo a2enmod cgi
+    args:
+      chdir: nagios-4.4.6/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: restart the apache service for Ubuntu
+    command: sudo systemctl restart apache2
+    args:
+      chdir: nagios-4.4.6/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: download the nagions plugin for Ubuntu
+    command: wget https://nagios-plugins.org/download/nagios-plugins-2.3.3.tar.gz
+    when: ansible_distribution == "Ubuntu"
+
+  - name: extract the plugin for Ubuntu
+    command: sudo tar -zxvf nagios-plugins-2.3.3.tar.gz
+    when: ansible_distribution == "Ubuntu"
+
+  - name: navigating to plugin's directory and run the plugin configure script for Ubuntu
+    command: sudo ./configure --with-nagios-user=nagios --with-nagios-group=nagios
+    args:
+      chdir: nagios-plugins-2.3.3/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: compile nagios plugins for Ubuntu
+    command: sudo make
+    args:
+      chdir: nagios-plugins-2.3.3/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install the plugins for Ubuntu
+    command: sudo make install
+    args:
+      chdir: nagios-plugins-2.3.3/
+    when: ansible_distribution == "Ubuntu"
+
+  - name: start nagios service for Ubuntu
+    command: sudo systemctl start nagios
+    when: ansible_distribution == "Ubuntu"
+
+  - name: enable nagios service for Ubuntu
+    command: sudo systemctl enable nagios
+    when: ansible_distribution == "Ubuntu"
